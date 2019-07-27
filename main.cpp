@@ -36,6 +36,5 @@ int main(int argc, char *argv[])
     View w;
     w.show();
 
-    
     return a.exec();
 }
