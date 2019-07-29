@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2016 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
@@ -55,19 +55,27 @@ View::View(QWidget *parent)
     m_chart->legend()->hide();
     QLineSeries *series = new QLineSeries;
     series->append(1, 3);
-    series->append(4, 5);
-    series->append(5, 4.5);
-    series->append(7, 1);
-    series->append(11, 2);
+    series->append(2, 5);
+    series->append(3, 4.5);
+    series->append(4, 1);
+    series->append(5, 2);
     m_chart->addSeries(series);
 
     QSplineSeries *series2 = new QSplineSeries;
-    series2->append(1.6, 1.4);
-    series2->append(2.4, 3.5);
-    series2->append(3.7, 2.5);
-    series2->append(7, 4);
-    series2->append(10, 2);
+    series2->append(1, 1.4);
+    series2->append(2, 3.5);
+    series2->append(3, 2.5);
+    series2->append(4, 4);
+    series2->append(5, 2);
     m_chart->addSeries(series2);
+
+    QSplineSeries *series3 = new QSplineSeries;
+    series3->append(1, 2.4);
+    series3->append(2, 4.5);
+    series3->append(3, 5.5);
+    series3->append(4, 6);
+    series3->append(5, 7);
+    m_chart->addSeries(series3);
 
     m_chart->createDefaultAxes();
     m_chart->setAcceptHoverEvents(true);
