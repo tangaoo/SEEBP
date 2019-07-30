@@ -50,16 +50,7 @@ View::View(QWidget *parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     QList<QString> Lines;
-    QFile inf("train.tra");
-    if (!inf.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    while (!inf.atEnd()) {
-        QByteArray line = inf.readLine();
-        QString str(line);
-//       qDebug() << str;
-        Lines.append(str);
-    }
+    Lines = GetData("train.tra");
 
     QStringList LineStr = Lines[10].split(" ");
 
@@ -116,6 +107,28 @@ View::View(QWidget *parent)
     connect(series2, SIGNAL(hovered(QPointF, bool)), this, SLOT(tooltip(QPointF,bool)));
 
     this->setMouseTracking(true);
+}
+
+QList<QString> View::GetData(QString filePath)
+{
+    QList<QString> Lines;
+    QFile inf(filePath);
+    if (!inf.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "open file wrong!";
+        //return NULL;
+    }
+
+
+    while (!inf.atEnd()) {
+        QByteArray line = inf.readLine();
+        QString str(line);
+//       qDebug() << str;
+        Lines.append(str);
+    }
+
+//    QStringList LineStr = Lines[10].split(" ");
+    return Lines;
 }
 
 void View::resizeEvent(QResizeEvent *event)

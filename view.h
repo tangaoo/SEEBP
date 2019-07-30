@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2016 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
@@ -52,6 +52,7 @@ class View: public QGraphicsView
 
 public:
     View(QWidget *parent = 0);
+    QList<QString> GetData(QString filePath);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -67,6 +68,12 @@ private:
     QChart *m_chart;
     Callout *m_tooltip;
     QList<Callout *> m_callouts;
+
+    int featureN;
+    int valueN;
+    QList<QString> valueCode;
+    int country;
+
 };
 
 #endif
