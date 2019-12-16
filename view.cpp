@@ -112,22 +112,20 @@ View::View(QWidget *parent)
 QList<QString> View::GetData(QString filePath)
 {
     QList<QString> Lines;
+    QString line;
     QFile inf(filePath);
     if (!inf.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << "open file wrong!";
-        //return NULL;
+//        return 0;
     }
 
-
-    while (!inf.atEnd()) {
-        QByteArray line = inf.readLine();
-        QString str(line);
-//       qDebug() << str;
-        Lines.append(str);
+    while (!inf.atEnd())
+    {
+        line = inf.readLine();
+        Lines.append(line);
     }
 
-//    QStringList LineStr = Lines[10].split(" ");
     return Lines;
 }
 
