@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2016 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
@@ -65,12 +65,8 @@ private:
     QComboBox *createAnimationBox() const;
     QComboBox *createLegendBox() const;
     void connectSignals();
-    QChart *createAreaChart() const;
-    QChart *createBarChart(int valueCount) const;
-    QChart *createPieChart() const;
     QChart *createLineChart() const;
-    QChart *createSplineChart() const;
-    QChart *createScatterChart() const;
+
 
 private:
     int m_listCount;

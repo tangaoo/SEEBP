@@ -54,7 +54,7 @@
 
 ThemeWidget::ThemeWidget(QWidget *parent) :
     QWidget(parent),
-    m_listCount(3),
+    m_listCount(100),
     m_valueMax(10),
     m_valueCount(7),
     m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
@@ -75,35 +75,26 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     settingsLayout->addWidget(m_legendComboBox);
     settingsLayout->addWidget(m_antialiasCheckBox);
     settingsLayout->addStretch();
-    baseLayout->addLayout(settingsLayout, 0, 0, 1, 3);
+    baseLayout->addLayout(settingsLayout, 0, 0, 1, 2);
 
     //create charts
 
     QChartView *chartView;
 
-    chartView = new QChartView(createAreaChart());
+    chartView = new QChartView(createLineChart());
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createBarChart(m_valueCount));
+    chartView = new QChartView(createLineChart());
     baseLayout->addWidget(chartView, 1, 1);
     m_charts << chartView;
 
     chartView = new QChartView(createLineChart());
-    baseLayout->addWidget(chartView, 1, 2);
-    m_charts << chartView;
-
-    chartView = new QChartView(createPieChart());
-    chartView->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored); // funny things happen if the pie slice labels no not fit the screen...
     baseLayout->addWidget(chartView, 2, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createSplineChart());
+    chartView = new QChartView(createLineChart());
     baseLayout->addWidget(chartView, 2, 1);
-    m_charts << chartView;
-
-    chartView = new QChartView(createScatterChart());
-    baseLayout->addWidget(chartView, 2, 2);
     m_charts << chartView;
 
     setLayout(baseLayout);
@@ -186,56 +177,6 @@ QComboBox *ThemeWidget::createLegendBox() const
     return legendComboBox;
 }
 
-QChart *ThemeWidget::createAreaChart() const
-{
-    QChart *chart = new QChart();
-    chart->setTitle("Area chart");
-
-    // The lower series initialized to zero values
-    QLineSeries *lowerSeries = 0;
-    QString name("Series ");
-    int nameIndex = 0;
-    for (int i(0); i < m_dataTable.count(); i++) {
-        QLineSeries *upperSeries = new QLineSeries(chart);
-        for (int j(0); j < m_dataTable[i].count(); j++) {
-            Data data = m_dataTable[i].at(j);
-            if (lowerSeries) {
-                const QVector<QPointF>& points = lowerSeries->pointsVector();
-                upperSeries->append(QPointF(j, points[i].y() + data.first.y()));
-            } else {
-                upperSeries->append(QPointF(j, data.first.y()));
-            }
-        }
-        QAreaSeries *area = new QAreaSeries(upperSeries, lowerSeries);
-        area->setName(name + QString::number(nameIndex));
-        nameIndex++;
-        chart->addSeries(area);
-        chart->createDefaultAxes();
-        lowerSeries = upperSeries;
-    }
-
-    return chart;
-}
-
-QChart *ThemeWidget::createBarChart(int valueCount) const
-{
-    Q_UNUSED(valueCount);
-    QChart *chart = new QChart();
-    chart->setTitle("Bar chart");
-
-    QStackedBarSeries *series = new QStackedBarSeries(chart);
-    for (int i(0); i < m_dataTable.count(); i++) {
-        QBarSet *set = new QBarSet("Bar set " + QString::number(i));
-        foreach (Data data, m_dataTable[i])
-            *set << data.first.y();
-        series->append(set);
-    }
-    chart->addSeries(series);
-    chart->createDefaultAxes();
-
-    return chart;
-}
-
 QChart *ThemeWidget::createLineChart() const
 {
     QChart *chart = new QChart();
@@ -253,69 +194,6 @@ QChart *ThemeWidget::createLineChart() const
     }
     chart->createDefaultAxes();
 
-    return chart;
-}
-
-QChart *ThemeWidget::createPieChart() const
-{
-    QChart *chart = new QChart();
-    chart->setTitle("Pie chart");
-
-    qreal pieSize = 1.0 / m_dataTable.count();
-    for (int i = 0; i < m_dataTable.count(); i++) {
-        QPieSeries *series = new QPieSeries(chart);
-        foreach (Data data, m_dataTable[i]) {
-            QPieSlice *slice = series->append(data.second, data.first.y());
-            if (data == m_dataTable[i].first()) {
-                slice->setLabelVisible();
-                slice->setExploded();
-            }
-        }
-        qreal hPos = (pieSize / 2) + (i / (qreal) m_dataTable.count());
-        series->setPieSize(pieSize);
-        series->setHorizontalPosition(hPos);
-        series->setVerticalPosition(0.5);
-        chart->addSeries(series);
-    }
-
-    return chart;
-}
-
-QChart *ThemeWidget::createSplineChart() const
-{
-    // spine chart
-    QChart *chart = new QChart();
-    chart->setTitle("Spline chart");
-    QString name("Series ");
-    int nameIndex = 0;
-    foreach (DataList list, m_dataTable) {
-        QSplineSeries *series = new QSplineSeries(chart);
-        foreach (Data data, list)
-            series->append(data.first);
-        series->setName(name + QString::number(nameIndex));
-        nameIndex++;
-        chart->addSeries(series);
-    }
-    chart->createDefaultAxes();
-    return chart;
-}
-
-QChart *ThemeWidget::createScatterChart() const
-{
-    // scatter chart
-    QChart *chart = new QChart();
-    chart->setTitle("Scatter chart");
-    QString name("Series ");
-    int nameIndex = 0;
-    foreach (DataList list, m_dataTable) {
-        QScatterSeries *series = new QScatterSeries(chart);
-        foreach (Data data, list)
-            series->append(data.first);
-        series->setName(name + QString::number(nameIndex));
-        nameIndex++;
-        chart->addSeries(series);
-    }
-    chart->createDefaultAxes();
     return chart;
 }
 

@@ -53,5 +53,6 @@ int main(int argc, char *argv[])
     window.setCentralWidget(widget);
     window.resize(900, 600);
     window.show();
+
     return a.exec();
 }
