@@ -32,6 +32,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtCharts/QChartGlobal>
+//#include <QMap>
 
 QT_BEGIN_NAMESPACE
 class QComboBox;
@@ -46,6 +47,7 @@ QT_CHARTS_END_NAMESPACE
 typedef QPair<QPointF, QString> Data;
 typedef QList<Data> DataList;
 typedef QList<DataList> DataTable;
+typedef QMap<QString, DataTable> DataMap;
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -61,11 +63,12 @@ private Q_SLOTS:
 
 private:
     DataTable generateRandomData(int listCount, int valueMax, int valueCount) const;
+    DataTable getFileData(const QString &file);
     QComboBox *createThemeBox() const;
     QComboBox *createAnimationBox() const;
     QComboBox *createLegendBox() const;
     void connectSignals();
-    QChart *createLineChart() const;
+    QChart *createLineChart(const QString &str) const;
 
 
 private:

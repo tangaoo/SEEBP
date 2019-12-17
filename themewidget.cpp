@@ -51,18 +51,21 @@
 #include <QtWidgets/QLabel>
 #include <QtCore/QTime>
 #include <QtCharts/QBarCategoryAxis>
+#include <QDebug>
 
 ThemeWidget::ThemeWidget(QWidget *parent) :
     QWidget(parent),
     m_listCount(100),
     m_valueMax(10),
-    m_valueCount(7),
+    m_valueCount(96),
     m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
     m_themeComboBox(createThemeBox()),
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
     m_animatedComboBox(createAnimationBox()),
     m_legendComboBox(createLegendBox())
 {
+    getFileData("train.tra");
+
     connectSignals();
     // create layout
     QGridLayout *baseLayout = new QGridLayout();
@@ -81,19 +84,19 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
 
     QChartView *chartView;
 
-    chartView = new QChartView(createLineChart());
+    chartView = new QChartView(createLineChart("A 面"));
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart());
+    chartView = new QChartView(createLineChart("B 面"));
     baseLayout->addWidget(chartView, 1, 1);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart());
+    chartView = new QChartView(createLineChart("C 面"));
     baseLayout->addWidget(chartView, 2, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart());
+    chartView = new QChartView(createLineChart("D 面"));
     baseLayout->addWidget(chartView, 2, 1);
     m_charts << chartView;
 
@@ -129,13 +132,52 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
         qreal yValue(0);
         for (int j(0); j < valueCount; j++) {
             yValue = yValue + (qreal)(qrand() % valueMax) / (qreal) valueCount;
-            QPointF value((j + (qreal) rand() / (qreal) RAND_MAX) * ((qreal) m_valueMax / (qreal) valueCount),
-                          yValue);
+//            QPointF value((j + (qreal) rand() / (qreal) RAND_MAX) * ((qreal) m_valueMax / (qreal) valueCount), yValue);
+            QPointF value(j, yValue);
             QString label = "Slice " + QString::number(i) + ":" + QString::number(j);
             dataList << Data(value, label);
         }
         dataTable << dataList;
     }
+
+    return dataTable;
+}
+
+
+DataTable ThemeWidget::getFileData(const QString &file)
+{
+    DataTable dataTable;
+    QList<QString> Lines;
+    QString l;
+    QFile f(file);
+    qint32 featurenum, valuenum, i;
+    QString country;
+    QList<QString> values;
+    QList<QString> valuesDirection;
+
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "open file wrong!";
+    }
+
+    while (!f.atEnd())
+    {
+        l = f.readLine();
+        Lines<<l;
+    }
+    featurenum = Lines[2].toInt();
+    valuenum = Lines[3].toInt();
+    values = Lines[4].split(" ");
+    country = Lines[5];
+    for(i = 0; i < valuenum; i++)
+    {
+        valuesDirection << (values[i] + "_A");
+        valuesDirection << (values[i] + "_B");
+        valuesDirection << (values[i] + "_C");
+        valuesDirection << (values[i] + "_D");
+    }
+
+//    return Lines;
 
     return dataTable;
 }
@@ -177,10 +219,10 @@ QComboBox *ThemeWidget::createLegendBox() const
     return legendComboBox;
 }
 
-QChart *ThemeWidget::createLineChart() const
+QChart *ThemeWidget::createLineChart(const QString &str) const
 {
     QChart *chart = new QChart();
-    chart->setTitle("Line chart");
+    chart->setTitle(str);
 
     QString name("Series ");
     int nameIndex = 0;
