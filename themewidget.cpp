@@ -146,36 +146,77 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
 
 DataTable ThemeWidget::getFileData(const QString &file)
 {
+    DataMap dataMap;
     DataTable dataTable;
+
     QList<QString> Lines;
     QString l;
     QFile f(file);
     qint32 featurenum, valuenum, i;
     QString country;
+    QList<QString> y;
     QList<QString> values;
-    QList<QString> valuesDirection;
+    QList<QString> valuesFace;
+    const QString face[4] = {"_A", "_B", "_C", "_D"};
+    QString faceTemp;
+    QString valueTemp;
+    QString valueFaceTemp;
+
 
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << "open file wrong!";
     }
 
+    if(!f.atEnd())
+    {
+        for(i=0; i<6; i++)   //前面6行非数据
+        {
+            l = f.readLine();
+            Lines << l;
+        }
+        featurenum = Lines[2].toInt();
+        valuenum = Lines[3].toInt();
+        values = Lines[4].split(" ");
+        country = Lines[5];
+    }
+    Lines.clear();
+
     while (!f.atEnd())
     {
         l = f.readLine();
-        Lines<<l;
+        y = l.split(" ");
+
+        //get face
+        for(i=0; i<4; i++)
+        {
+            if(1.0 - y[i].toFloat() < 0.01 )
+                break;
+        }
+        faceTemp = face[i];
+
+        //get values
+        for(i=4; i<4+valuenum; i++)
+        {
+            if(1.0 - y[i].toFloat() < 0.01 )
+                break;
+        }
+        valueTemp = values[i-4];
+        valueFaceTemp = valueTemp + faceTemp;
+
+        DataList dataList;
+        for (int j(0); j < featurenum; j++)
+        {
+            QPointF value(j, y[j+valuenum+4].toFloat());
+            QString label = "Slice " + QString::number(i) + ":" + QString::number(j);
+            dataList << Data(value, label);
+        }
+        if(dataMap.find(valueFaceTemp) == dataMap.end())
+            dataMap[valueFaceTemp] << dataList;
+        else
+            dataMap[valueFaceTemp] << dataList;
     }
-    featurenum = Lines[2].toInt();
-    valuenum = Lines[3].toInt();
-    values = Lines[4].split(" ");
-    country = Lines[5];
-    for(i = 0; i < valuenum; i++)
-    {
-        valuesDirection << (values[i] + "_A");
-        valuesDirection << (values[i] + "_B");
-        valuesDirection << (values[i] + "_C");
-        valuesDirection << (values[i] + "_D");
-    }
+
 
 //    return Lines;
 
