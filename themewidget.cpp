@@ -53,7 +53,6 @@
 #include <QtCharts/QBarCategoryAxis>
 #include <QDebug>
 
-DataMap dataMap; //todo 函数返回会错
 
 ThemeWidget::ThemeWidget(QWidget *parent) :
     QWidget(parent),
@@ -86,7 +85,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     //create charts
 
     QChartView *chartView;
-    DataMap::iterator it = dataMap.begin()+1;
+    DataMap::iterator it = m_dataMap.begin()+1;
 
     chartView = new QChartView(createLineChart("A 面", (it++).value()));
     baseLayout->addWidget(chartView, 1, 0);
@@ -148,7 +147,7 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
 }
 
 
-DataMap ThemeWidget::getFileData(const QString &file)
+void ThemeWidget::getFileData(const QString &file)
 {
     //DataMap dataMap;
     DataTable dataTable;
@@ -220,14 +219,9 @@ DataMap ThemeWidget::getFileData(const QString &file)
             dataList << Data(value, label);
         }
 
-        dataMap[valueFaceTemp].push_back(dataList);
-
+        m_dataMap[valueFaceTemp].push_back(dataList);
     }
 
-
-//    return Lines;
-
-    return dataMap;
 }
 
 QComboBox *ThemeWidget::createThemeBox() const

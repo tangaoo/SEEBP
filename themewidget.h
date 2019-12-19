@@ -32,7 +32,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtCharts/QChartGlobal>
-//#include <QMap>
+#include <QMap>
 
 QT_BEGIN_NAMESPACE
 class QComboBox;
@@ -63,7 +63,7 @@ private Q_SLOTS:
 
 private:
     DataTable generateRandomData(int listCount, int valueMax, int valueCount) const;
-    DataMap getFileData(const QString &file);
+    void getFileData(const QString &file);
     QComboBox *createThemeBox() const;
     QComboBox *createAnimationBox() const;
     QComboBox *createLegendBox() const;
@@ -78,7 +78,7 @@ private:
     int m_valueCount;
     QList<QChartView *> m_charts;
     DataTable m_dataTable;
-//    DataMap m_dataMap;
+    DataMap m_dataMap;
 
     QComboBox *m_themeComboBox;
     QCheckBox *m_antialiasCheckBox;
