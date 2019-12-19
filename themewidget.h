@@ -68,7 +68,8 @@ private:
     QComboBox *createAnimationBox() const;
     QComboBox *createLegendBox() const;
     void connectSignals();
-    QChart *createLineChart(const QString &str) const;
+    QChart *createLineChart(const QString &str, const DataTable &dataTable) const;
+//    QChart *createLineChart(const QString &str) const;
 
 
 private:

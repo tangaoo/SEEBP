@@ -53,7 +53,7 @@
 #include <QtCharts/QBarCategoryAxis>
 #include <QDebug>
 
-DataMap dataMap;
+DataMap dataMap; //todo 函数返回会错
 
 ThemeWidget::ThemeWidget(QWidget *parent) :
     QWidget(parent),
@@ -86,20 +86,21 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     //create charts
 
     QChartView *chartView;
+    DataMap::iterator it = dataMap.begin()+1;
 
-    chartView = new QChartView(createLineChart("A 面"));
+    chartView = new QChartView(createLineChart("A 面", (it++).value()));
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart("B 面"));
+    chartView = new QChartView(createLineChart("B 面", (it++).value()));
     baseLayout->addWidget(chartView, 1, 1);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart("C 面"));
+    chartView = new QChartView(createLineChart("C 面", (it++).value()));
     baseLayout->addWidget(chartView, 2, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart("D 面"));
+    chartView = new QChartView(createLineChart("D 面", (it++).value()));
     baseLayout->addWidget(chartView, 2, 1);
     m_charts << chartView;
 
@@ -266,17 +267,17 @@ QComboBox *ThemeWidget::createLegendBox() const
     return legendComboBox;
 }
 
-//0xa393_D
-QChart *ThemeWidget::createLineChart(const QString &str) const
+
+QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTable) const
 {
     QChart *chart = new QChart();
     chart->setTitle(str);
 
     QString name("Series ");
     int nameIndex = 0;
-    DataMap::iterator it = dataMap.begin()+1;
+//    DataMap::iterator it = dataMap.begin()+1;
 //    foreach (DataList list, m_dataTable) {
-    foreach (DataList list, it.value() ) {
+    foreach (DataList list, dataTable ) {
         QLineSeries *series = new QLineSeries(chart);
         foreach (Data data, list)
             series->append(data.first);
