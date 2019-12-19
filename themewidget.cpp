@@ -85,21 +85,20 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     //create charts
 
     QChartView *chartView;
-    DataMap::iterator it = m_dataMap.begin()+1;
 
-    chartView = new QChartView(createLineChart("A 面", (it++).value()));
+    chartView = new QChartView(createLineChart(m_values[0] + m_face[0], m_dataMap[m_values[0] + m_face[0]]));
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart("B 面", (it++).value()));
+    chartView = new QChartView(createLineChart(m_values[0] + m_face[1], m_dataMap[m_values[0] + m_face[1]]));
     baseLayout->addWidget(chartView, 1, 1);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart("C 面", (it++).value()));
+    chartView = new QChartView(createLineChart(m_values[0] + m_face[2], m_dataMap[m_values[0] + m_face[2]]));
     baseLayout->addWidget(chartView, 2, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart("D 面", (it++).value()));
+    chartView = new QChartView(createLineChart(m_values[0] + m_face[3], m_dataMap[m_values[0] + m_face[3]]));
     baseLayout->addWidget(chartView, 2, 1);
     m_charts << chartView;
 
@@ -155,12 +154,10 @@ void ThemeWidget::getFileData(const QString &file)
     QList<QString> Lines;
     QString l;
     QFile f(file);
-    qint32 featurenum, valuenum, i, linenum;
+    qint32 featurenum, i, linenum;
     QString country;
     QList<QString> y;
     QList<QString> values;
-    QList<QString> valuesFace;
-    const QString face[4] = {"_A", "_B", "_C", "_D"};
     QString faceTemp;
     QString valueTemp;
     QString valueFaceTemp;
@@ -180,8 +177,8 @@ void ThemeWidget::getFileData(const QString &file)
         }
         linenum = Lines[0].toInt();
         featurenum = Lines[2].toInt();
-        valuenum = Lines[3].toInt();
-        values = Lines[4].split(" ");
+        m_valuenum = Lines[3].toInt();
+        m_values = Lines[4].split(" ");
         country = Lines[5];
     }
     Lines.clear();
@@ -198,23 +195,25 @@ void ThemeWidget::getFileData(const QString &file)
             if(1.0 - y[i].toFloat() < 0.01 )
                 break;
         }
-        faceTemp = face[i];
+        if(i >= 4)
+            continue;
+        faceTemp = m_face[i];
 
         //get values
-        for(i=4; i<4+valuenum; i++)
+        for(i=4; i<4+m_valuenum; i++)
         {
             if(1.0 - y[i].toFloat() < 0.01 )
                 break;
         }
-        valueTemp = values[i-4];
-        valueFaceTemp = valueTemp + faceTemp;
-        if(valueFaceTemp.size() < 2)
+        if(i >= 4+m_valuenum)
             continue;
+        valueTemp = m_values[i-4];
+        valueFaceTemp = valueTemp + faceTemp;
 
         DataList dataList;
         for (int j(0); j < featurenum; j++)
         {
-            QPointF value(j, y[j+valuenum+4].toFloat());
+            QPointF value(j, y[j+m_valuenum+4].toFloat());
             QString label = "Slice " + QString::number(i) + ":" + QString::number(j);
             dataList << Data(value, label);
         }

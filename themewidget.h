@@ -76,9 +76,12 @@ private:
     int m_listCount;
     int m_valueMax;
     int m_valueCount;
+    int m_valuenum;
     QList<QChartView *> m_charts;
     DataTable m_dataTable;
     DataMap m_dataMap;
+    const QVector<QString> m_face = {"_A", "_B", "_C", "_D", ""}; //向量越界
+    QList<QString> m_values;
 
     QComboBox *m_themeComboBox;
     QCheckBox *m_antialiasCheckBox;
