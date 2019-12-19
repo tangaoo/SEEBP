@@ -53,19 +53,22 @@
 #include <QtCharts/QBarCategoryAxis>
 #include <QDebug>
 
+DataMap dataMap;
+
 ThemeWidget::ThemeWidget(QWidget *parent) :
     QWidget(parent),
     m_listCount(100),
     m_valueMax(10),
     m_valueCount(96),
     m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
+//    m_dataMap(getFileData("train.tra")),
     m_themeComboBox(createThemeBox()),
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
     m_animatedComboBox(createAnimationBox()),
     m_legendComboBox(createLegendBox())
 {
-    getFileData("train.tra");
 
+    getFileData("train.tra");
     connectSignals();
     // create layout
     QGridLayout *baseLayout = new QGridLayout();
@@ -144,15 +147,15 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
 }
 
 
-DataTable ThemeWidget::getFileData(const QString &file)
+DataMap ThemeWidget::getFileData(const QString &file)
 {
-    DataMap dataMap;
+    //DataMap dataMap;
     DataTable dataTable;
 
     QList<QString> Lines;
     QString l;
     QFile f(file);
-    qint32 featurenum, valuenum, i;
+    qint32 featurenum, valuenum, i, linenum;
     QString country;
     QList<QString> y;
     QList<QString> values;
@@ -175,6 +178,7 @@ DataTable ThemeWidget::getFileData(const QString &file)
             l = f.readLine();
             Lines << l;
         }
+        linenum = Lines[0].toInt();
         featurenum = Lines[2].toInt();
         valuenum = Lines[3].toInt();
         values = Lines[4].split(" ");
@@ -182,7 +186,8 @@ DataTable ThemeWidget::getFileData(const QString &file)
     }
     Lines.clear();
 
-    while (!f.atEnd())
+ //   while (!f.atEnd())
+    for (int z(0); z < linenum; z++)
     {
         l = f.readLine();
         y = l.split(" ");
@@ -203,6 +208,8 @@ DataTable ThemeWidget::getFileData(const QString &file)
         }
         valueTemp = values[i-4];
         valueFaceTemp = valueTemp + faceTemp;
+        if(valueFaceTemp.size() < 2)
+            continue;
 
         DataList dataList;
         for (int j(0); j < featurenum; j++)
@@ -211,16 +218,15 @@ DataTable ThemeWidget::getFileData(const QString &file)
             QString label = "Slice " + QString::number(i) + ":" + QString::number(j);
             dataList << Data(value, label);
         }
-        if(dataMap.find(valueFaceTemp) == dataMap.end())
-            dataMap[valueFaceTemp] << dataList;
-        else
-            dataMap[valueFaceTemp] << dataList;
+
+        dataMap[valueFaceTemp].push_back(dataList);
+
     }
 
 
 //    return Lines;
 
-    return dataTable;
+    return dataMap;
 }
 
 QComboBox *ThemeWidget::createThemeBox() const
@@ -260,6 +266,7 @@ QComboBox *ThemeWidget::createLegendBox() const
     return legendComboBox;
 }
 
+//0xa393_D
 QChart *ThemeWidget::createLineChart(const QString &str) const
 {
     QChart *chart = new QChart();
@@ -267,7 +274,9 @@ QChart *ThemeWidget::createLineChart(const QString &str) const
 
     QString name("Series ");
     int nameIndex = 0;
-    foreach (DataList list, m_dataTable) {
+    DataMap::iterator it = dataMap.begin()+1;
+//    foreach (DataList list, m_dataTable) {
+    foreach (DataList list, it.value() ) {
         QLineSeries *series = new QLineSeries(chart);
         foreach (Data data, list)
             series->append(data.first);
