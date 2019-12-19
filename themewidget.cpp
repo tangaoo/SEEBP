@@ -60,14 +60,12 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_valueMax(10),
     m_valueCount(96),
     m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
-//    m_dataMap(getFileData("train.tra")),
     m_themeComboBox(createThemeBox()),
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
-    m_animatedComboBox(createAnimationBox()),
-    m_legendComboBox(createLegendBox())
+    m_animatedComboBox(createAnimationBox())
 {
-
     getFileData("train.tra");
+    m_legendComboBox = createLegendBox();
     connectSignals();
     // create layout
     QGridLayout *baseLayout = new QGridLayout();
@@ -76,7 +74,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     settingsLayout->addWidget(m_themeComboBox);
     settingsLayout->addWidget(new QLabel("Animation:"));
     settingsLayout->addWidget(m_animatedComboBox);
-    settingsLayout->addWidget(new QLabel("Legend:"));
+    settingsLayout->addWidget(new QLabel("Value:"));
     settingsLayout->addWidget(m_legendComboBox);
     settingsLayout->addWidget(m_antialiasCheckBox);
     settingsLayout->addStretch();
@@ -251,12 +249,21 @@ QComboBox *ThemeWidget::createAnimationBox() const
 
 QComboBox *ThemeWidget::createLegendBox() const
 {
+    /*
     QComboBox *legendComboBox = new QComboBox();
     legendComboBox->addItem("No Legend ", 0);
     legendComboBox->addItem("Legend Top", Qt::AlignTop);
     legendComboBox->addItem("Legend Bottom", Qt::AlignBottom);
     legendComboBox->addItem("Legend Left", Qt::AlignLeft);
     legendComboBox->addItem("Legend Right", Qt::AlignRight);
+    return legendComboBox;
+    */
+    QComboBox *legendComboBox = new QComboBox();
+    for(int i(0); i<m_valuenum; i++ )
+    {
+        legendComboBox->addItem(m_values[i], 0);
+    }
+
     return legendComboBox;
 }
 
@@ -265,11 +272,9 @@ QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTa
 {
     QChart *chart = new QChart();
     chart->setTitle(str);
-
     QString name("Series ");
     int nameIndex = 0;
-//    DataMap::iterator it = dataMap.begin()+1;
-//    foreach (DataList list, m_dataTable) {
+
     foreach (DataList list, dataTable ) {
         QLineSeries *series = new QLineSeries(chart);
         foreach (Data data, list)
@@ -282,6 +287,13 @@ QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTa
 
     return chart;
 }
+
+/*
+void ThemeWidget::updateUI()
+{
+    int idx = m_legendComboBox->currentIndex();
+}*/
+
 
 void ThemeWidget::updateUI()
 {
@@ -339,7 +351,9 @@ void ThemeWidget::updateUI()
         foreach (QChartView *chartView, m_charts) {
             chartView->chart()->legend()->setAlignment(alignment);
             chartView->chart()->legend()->show();
+//            chartView->chart()->show();
         }
     }
 }
+
 
