@@ -54,6 +54,8 @@
 #include <QDebug>
 
 
+QMap<QString, QList<QLineSeries *>> g_mapSeries;
+
 ThemeWidget::ThemeWidget(QWidget *parent) :
     QWidget(parent),
     m_listCount(100),
@@ -68,7 +70,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_legendComboBox = createLegendBox();
     connectSignals();
     // create layout
-    QGridLayout *baseLayout = new QGridLayout();
+    baseLayout = new QGridLayout();
     QHBoxLayout *settingsLayout = new QHBoxLayout();
     settingsLayout->addWidget(new QLabel("Theme:"));
     settingsLayout->addWidget(m_themeComboBox);
@@ -116,7 +118,7 @@ void ThemeWidget::connectSignals()
     connect(m_themeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUI()));
     connect(m_antialiasCheckBox, SIGNAL(toggled(bool)), this, SLOT(updateUI()));
     connect(m_animatedComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUI()));
-    connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUI()));
+    connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
 }
 
 DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int valueCount) const
@@ -281,6 +283,7 @@ QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTa
             series->append(data.first);
         series->setName(name + QString::number(nameIndex));
         nameIndex++;
+        g_mapSeries[str].push_back(series);
         chart->addSeries(series);
     }
     chart->createDefaultAxes();
@@ -288,11 +291,37 @@ QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTa
     return chart;
 }
 
-/*
-void ThemeWidget::updateUI()
+
+void ThemeWidget::updateUIII()
 {
     int idx = m_legendComboBox->currentIndex();
-}*/
+
+    QChartView *chartView;
+
+    m_charts.clear();
+    chartView = new QChartView(createLineChart(m_values[1] + m_face[0], m_dataMap[m_values[1] + m_face[0]]));
+    baseLayout->addWidget(chartView, 1, 0);
+    m_charts << chartView;
+
+    chartView = new QChartView(createLineChart(m_values[1] + m_face[1], m_dataMap[m_values[1] + m_face[1]]));
+    baseLayout->addWidget(chartView, 1, 1);
+    m_charts << chartView;
+
+    chartView = new QChartView(createLineChart(m_values[1] + m_face[2], m_dataMap[m_values[1] + m_face[2]]));
+    baseLayout->addWidget(chartView, 2, 0);
+    m_charts << chartView;
+
+    chartView = new QChartView(createLineChart(m_values[1] + m_face[3], m_dataMap[m_values[1] + m_face[3]]));
+    baseLayout->addWidget(chartView, 2, 1);
+    m_charts << chartView;
+
+    foreach (QChartView *chartView, m_charts)
+    {
+//        chartView->chart()->legend()->setAlignment(alignment);
+        chartView->chart()->legend()->show();
+        chartView->chart()->show();
+    }
+}
 
 
 void ThemeWidget::updateUI()

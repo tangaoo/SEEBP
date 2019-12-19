@@ -32,6 +32,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtCharts/QChartGlobal>
+#include <QtWidgets/QGridLayout>
 #include <QMap>
 
 QT_BEGIN_NAMESPACE
@@ -60,6 +61,7 @@ public:
 
 private Q_SLOTS:
     void updateUI();
+    void updateUIII();
 
 private:
     DataTable generateRandomData(int listCount, int valueMax, int valueCount) const;
@@ -83,6 +85,7 @@ private:
     const QVector<QString> m_face = {"_A", "_B", "_C", "_D", ""}; //向量越界
     QList<QString> m_values;
 
+    QGridLayout *baseLayout;
     QComboBox *m_themeComboBox;
     QCheckBox *m_antialiasCheckBox;
     QComboBox *m_animatedComboBox;
