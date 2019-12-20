@@ -55,7 +55,6 @@
 #include <QtCharts/QBarCategoryAxis>
 #include <QDebug>
 
-
 QMap<QString, QList<QLineSeries *>> g_mapSeries;
 
 ThemeWidget::ThemeWidget(QWidget *parent) :
@@ -64,6 +63,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_valueMax(10),
     m_valueCount(96),
     m_lineEdit(new QLineEdit),
+    m_button(new QPushButton("Show")),
     m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
     m_themeComboBox(createThemeBox()),
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
@@ -78,13 +78,14 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     QHBoxLayout *settingsLayout = new QHBoxLayout();
     settingsLayout->addWidget(new QLabel("Path:"));
     settingsLayout->addWidget(m_lineEdit);
-    settingsLayout->addWidget(new QLabel("Theme:"));
-    settingsLayout->addWidget(m_themeComboBox);
-    settingsLayout->addWidget(new QLabel("Animation:"));
-    settingsLayout->addWidget(m_animatedComboBox);
-    settingsLayout->addWidget(new QLabel("Value:"));
+    settingsLayout->addWidget(m_button);
+//    settingsLayout->addWidget(new QLabel("Theme:"));
+//    settingsLayout->addWidget(m_themeComboBox);
+//    settingsLayout->addWidget(new QLabel("Animation:"));
+//    settingsLayout->addWidget(m_animatedComboBox);
+    settingsLayout->addWidget(new QLabel("                      Value:"));
     settingsLayout->addWidget(m_legendComboBox);
-    settingsLayout->addWidget(m_antialiasCheckBox);
+//    settingsLayout->addWidget(m_antialiasCheckBox);
     settingsLayout->addStretch();
     baseLayout->addLayout(settingsLayout, 0, 0, 1, 2);
 
@@ -129,6 +130,8 @@ void ThemeWidget::connectSignals()
     connect(m_antialiasCheckBox, SIGNAL(toggled(bool)), this, SLOT(updateUI()));
     connect(m_animatedComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUI()));
     connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+    connect(m_button, SIGNAL(released()), this, SLOT(buttonReleased()));
+
 }
 
 DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int valueCount) const
@@ -288,6 +291,10 @@ QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTa
     return chart;
 }
 
+void ThemeWidget::buttonReleased()
+{
+    m_chart_A->setTitle("button event");
+}
 
 void ThemeWidget::updateUIII()
 {

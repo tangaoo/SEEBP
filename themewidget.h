@@ -66,6 +66,7 @@ public:
 private Q_SLOTS:
     void updateUI();
     void updateUIII();
+    void buttonReleased();
 
 private:
     DataTable generateRandomData(int listCount, int valueMax, int valueCount) const;
@@ -94,6 +95,7 @@ private:
     QChart *m_chart_C;
     QChart *m_chart_D;
     QLineEdit *m_lineEdit;
+    QPushButton *m_button;
     QGridLayout *baseLayout;
     QComboBox *m_themeComboBox;
     QCheckBox *m_antialiasCheckBox;
