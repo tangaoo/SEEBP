@@ -45,7 +45,7 @@ class QChartView;
 class QChart;
 QT_CHARTS_END_NAMESPACE
 
-typedef QPair<QPointF, QString> Data;
+typedef QPointF Data;
 typedef QList<Data> DataList;
 typedef QList<DataList> DataTable;
 typedef QMap<QString, DataTable> DataMap;

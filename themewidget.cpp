@@ -134,10 +134,8 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
         qreal yValue(0);
         for (int j(0); j < valueCount; j++) {
             yValue = yValue + (qreal)(qrand() % valueMax) / (qreal) valueCount;
-//            QPointF value((j + (qreal) rand() / (qreal) RAND_MAX) * ((qreal) m_valueMax / (qreal) valueCount), yValue);
-            QPointF value(j, yValue);
-            QString label = "Slice " + QString::number(i) + ":" + QString::number(j);
-            dataList << Data(value, label);
+            QPointF value(j, yValue);         
+            dataList << value;
         }
         dataTable << dataList;
     }
@@ -214,8 +212,7 @@ void ThemeWidget::getFileData(const QString &file)
         for (int j(0); j < featurenum; j++)
         {
             QPointF value(j, y[j+m_valuenum+4].toFloat());
-            QString label = "Slice " + QString::number(i) + ":" + QString::number(j);
-            dataList << Data(value, label);
+            dataList << value;
         }
 
         m_dataMap[valueFaceTemp].push_back(dataList);
@@ -277,12 +274,15 @@ QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTa
     QString name("Series ");
     int nameIndex = 0;
 
-    foreach (DataList list, dataTable ) {
+    foreach (DataList list, dataTable )
+    {
         QLineSeries *series = new QLineSeries(chart);
-        foreach (Data data, list)
-            series->append(data.first);
+//        foreach (Data data, list)
+//            series->append(data.first);
+        series->append(list);
         series->setName(name + QString::number(nameIndex));
         nameIndex++;
+//        series->setUseOpenGL(true);
         g_mapSeries[str].push_back(series);
         chart->addSeries(series);
     }
@@ -294,33 +294,29 @@ QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTa
 
 void ThemeWidget::updateUIII()
 {
+    int i = 0;
+
+    QString name("Series ");
     int idx = m_legendComboBox->currentIndex();
 
-    QChartView *chartView;
-
-    m_charts.clear();
-    chartView = new QChartView(createLineChart(m_values[1] + m_face[0], m_dataMap[m_values[1] + m_face[0]]));
-    baseLayout->addWidget(chartView, 1, 0);
-    m_charts << chartView;
-
-    chartView = new QChartView(createLineChart(m_values[1] + m_face[1], m_dataMap[m_values[1] + m_face[1]]));
-    baseLayout->addWidget(chartView, 1, 1);
-    m_charts << chartView;
-
-    chartView = new QChartView(createLineChart(m_values[1] + m_face[2], m_dataMap[m_values[1] + m_face[2]]));
-    baseLayout->addWidget(chartView, 2, 0);
-    m_charts << chartView;
-
-    chartView = new QChartView(createLineChart(m_values[1] + m_face[3], m_dataMap[m_values[1] + m_face[3]]));
-    baseLayout->addWidget(chartView, 2, 1);
-    m_charts << chartView;
-
-    foreach (QChartView *chartView, m_charts)
+    foreach (DataList list, m_dataMap[m_values[0] + m_face[0]] )
     {
-//        chartView->chart()->legend()->setAlignment(alignment);
-        chartView->chart()->legend()->show();
-        chartView->chart()->show();
+//        QLineSeries *series = new QLineSeries(chart);
+        QLineSeries *series = g_mapSeries[m_values[0] + m_face[0]][i];
+        foreach (Data data, list)
+        {
+
+    //        series->replace(data.first.rx(), data.first.ry(), data.first.rx(), 0.02);
+            series->clear();
+//            series->append(data.first.rx(), 0.02);
+        }
+
+        series->setName(name + QString::number(i));
+        i++;
+
+//        chart->addSeries(series);
     }
+
 }
 
 

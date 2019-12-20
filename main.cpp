@@ -41,6 +41,12 @@ int main(int argc, char *argv[])
 }
 */
 
+/*TODO:
+ * 1.replace方法更新数据
+ * 2.改数据结构vector
+ * 3.开启OpenGL
+*/
+
 #include "themewidget.h"
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
