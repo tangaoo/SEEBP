@@ -70,7 +70,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_animatedComboBox(createAnimationBox())
 {
 
-    getFileData("train.tra");
+//    getFileData("train.tra");
     m_legendComboBox = createLegendBox();
     connectSignals();
     // create layout
@@ -93,22 +93,22 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
 
     QChartView *chartView;
 
-    m_chart_A = createLineChart(m_values[0] + m_face[0], m_dataMap[m_values[0] + m_face[0]]);
+    m_chart_A = createLineChart("null_A");
     chartView = new QChartView(m_chart_A);
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-    m_chart_B = createLineChart(m_values[0] + m_face[1], m_dataMap[m_values[0] + m_face[1]]);
+    m_chart_B = createLineChart("null_B");
     chartView = new QChartView(m_chart_B);
     baseLayout->addWidget(chartView, 1, 1);
     m_charts << chartView;
 
-    m_chart_C = createLineChart(m_values[0] + m_face[2], m_dataMap[m_values[0] + m_face[2]]);
+    m_chart_C = createLineChart("null_C");
     chartView = new QChartView(m_chart_C);
     baseLayout->addWidget(chartView, 2, 0);
     m_charts << chartView;
 
-    m_chart_D = createLineChart(m_values[0] + m_face[3], m_dataMap[m_values[0] + m_face[3]]);
+    m_chart_D = createLineChart("null_D");
     chartView = new QChartView(m_chart_D);
     baseLayout->addWidget(chartView, 2, 1);
     m_charts << chartView;
@@ -158,8 +158,7 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
 
 
 void ThemeWidget::getFileData(const QString &file)
-{
-    //DataMap dataMap;
+{    
     DataTable dataTable;
 
     QList<QString> Lines;
@@ -262,30 +261,20 @@ QComboBox *ThemeWidget::createAnimationBox() const
 QComboBox *ThemeWidget::createLegendBox() const
 {
     QComboBox *legendComboBox = new QComboBox();
-    for(int i(0); i<m_valuenum; i++ )
-    {
-        legendComboBox->addItem(m_values[i], 0);
-    }
+//    for(int i(0); i<m_valuenum; i++ )
+//    {
+//        legendComboBox->addItem(m_values[i], 0);
+//    }
 
     return legendComboBox;
 }
 
 
-QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTable) const
+QChart *ThemeWidget::createLineChart(const QString &str) const
 {
     QChart *chart = new QChart();
     chart->setTitle(str);    
-    int nameIndex = 0;
 
-    foreach (DataList list, dataTable )
-    {
-        QLineSeries *series = new QLineSeries(chart);
-        series->append(list);
-        series->setName(str + QString::number(nameIndex++));
-        g_mapSeries[str].push_back(series);
-        chart->addSeries(series);
-        series->setUseOpenGL(true);
-    }
     chart->createDefaultAxes();
 
     return chart;
@@ -293,7 +282,13 @@ QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTa
 
 void ThemeWidget::buttonReleased()
 {
-    m_chart_A->setTitle("button event");
+//    m_chart_A->setTitle(m_lineEdit->text() );  train.tra
+    getFileData(m_lineEdit->text());
+
+    for(int i(0); i<m_valuenum; i++ )
+    {
+        m_legendComboBox->addItem(m_values[i], 0);
+    }
 }
 
 void ThemeWidget::updateUIII()

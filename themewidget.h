@@ -75,9 +75,7 @@ private:
     QComboBox *createAnimationBox() const;
     QComboBox *createLegendBox() const;
     void connectSignals();
-    QChart *createLineChart(const QString &str, const DataTable &dataTable) const;
-//    QChart *createLineChart(const QString &str) const;
-
+    QChart *createLineChart(const QString &str) const;
 
 private:
     int m_listCount;
@@ -94,6 +92,7 @@ private:
     QChart *m_chart_B;
     QChart *m_chart_C;
     QChart *m_chart_D;
+
     QLineEdit *m_lineEdit;
     QPushButton *m_button;
     QGridLayout *baseLayout;
