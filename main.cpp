@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
     ThemeWidget *widget = new ThemeWidget();
     window.setCentralWidget(widget);
     window.resize(900, 600);
+    window.setWindowTitle("SEEBP (V1.0)");
     window.show();
 
     return a.exec();

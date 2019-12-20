@@ -83,7 +83,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
 //    settingsLayout->addWidget(m_themeComboBox);
 //    settingsLayout->addWidget(new QLabel("Animation:"));
 //    settingsLayout->addWidget(m_animatedComboBox);
-    settingsLayout->addWidget(new QLabel("                      Value:"));
+    settingsLayout->addWidget(new QLabel("    Value:"));
     settingsLayout->addWidget(m_legendComboBox);
 //    settingsLayout->addWidget(m_antialiasCheckBox);
     settingsLayout->addStretch();
@@ -283,6 +283,9 @@ QChart *ThemeWidget::createLineChart(const QString &str) const
 void ThemeWidget::buttonReleased()
 {
 //    m_chart_A->setTitle(m_lineEdit->text() );  train.tra
+    if(m_lineEdit->text() == "" )
+        return;
+
     getFileData(m_lineEdit->text());
 
     for(int i(0); i<m_valuenum; i++ )
