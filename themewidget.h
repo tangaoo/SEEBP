@@ -35,9 +35,13 @@
 #include <QtWidgets/QGridLayout>
 #include <QMap>
 
+
 QT_BEGIN_NAMESPACE
 class QComboBox;
 class QCheckBox;
+class QLabel;
+class QLineEdit;
+class QPushButton;
 QT_END_NAMESPACE
 
 QT_CHARTS_BEGIN_NAMESPACE
@@ -45,9 +49,9 @@ class QChartView;
 class QChart;
 QT_CHARTS_END_NAMESPACE
 
-typedef QPointF Data;
-typedef QList<Data> DataList;
-typedef QList<DataList> DataTable;
+typedef QPointF                  Data;
+typedef QList<Data>              DataList;
+typedef QList<DataList>          DataTable;
 typedef QMap<QString, DataTable> DataMap;
 
 QT_CHARTS_USE_NAMESPACE
@@ -85,6 +89,11 @@ private:
     const QVector<QString> m_face = {"_A", "_B", "_C", "_D", ""}; //向量越界
     QList<QString> m_values;
 
+    QChart *m_chart_A;
+    QChart *m_chart_B;
+    QChart *m_chart_C;
+    QChart *m_chart_D;
+    QLineEdit *m_lineEdit;
     QGridLayout *baseLayout;
     QComboBox *m_themeComboBox;
     QCheckBox *m_antialiasCheckBox;

@@ -49,6 +49,8 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
 #include <QtCore/QTime>
 #include <QtCharts/QBarCategoryAxis>
 #include <QDebug>
@@ -61,17 +63,21 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_listCount(100),
     m_valueMax(10),
     m_valueCount(96),
+    m_lineEdit(new QLineEdit),
     m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
     m_themeComboBox(createThemeBox()),
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
     m_animatedComboBox(createAnimationBox())
 {
+
     getFileData("train.tra");
     m_legendComboBox = createLegendBox();
     connectSignals();
     // create layout
     baseLayout = new QGridLayout();
     QHBoxLayout *settingsLayout = new QHBoxLayout();
+    settingsLayout->addWidget(new QLabel("Path:"));
+    settingsLayout->addWidget(m_lineEdit);
     settingsLayout->addWidget(new QLabel("Theme:"));
     settingsLayout->addWidget(m_themeComboBox);
     settingsLayout->addWidget(new QLabel("Animation:"));
@@ -86,19 +92,23 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
 
     QChartView *chartView;
 
-    chartView = new QChartView(createLineChart(m_values[0] + m_face[0], m_dataMap[m_values[0] + m_face[0]]));
+    m_chart_A = createLineChart(m_values[0] + m_face[0], m_dataMap[m_values[0] + m_face[0]]);
+    chartView = new QChartView(m_chart_A);
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart(m_values[0] + m_face[1], m_dataMap[m_values[0] + m_face[1]]));
+    m_chart_B = createLineChart(m_values[0] + m_face[1], m_dataMap[m_values[0] + m_face[1]]);
+    chartView = new QChartView(m_chart_B);
     baseLayout->addWidget(chartView, 1, 1);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart(m_values[0] + m_face[2], m_dataMap[m_values[0] + m_face[2]]));
+    m_chart_C = createLineChart(m_values[0] + m_face[2], m_dataMap[m_values[0] + m_face[2]]);
+    chartView = new QChartView(m_chart_C);
     baseLayout->addWidget(chartView, 2, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createLineChart(m_values[0] + m_face[3], m_dataMap[m_values[0] + m_face[3]]));
+    m_chart_D = createLineChart(m_values[0] + m_face[3], m_dataMap[m_values[0] + m_face[3]]);
+    chartView = new QChartView(m_chart_D);
     baseLayout->addWidget(chartView, 2, 1);
     m_charts << chartView;
 
@@ -248,15 +258,6 @@ QComboBox *ThemeWidget::createAnimationBox() const
 
 QComboBox *ThemeWidget::createLegendBox() const
 {
-    /*
-    QComboBox *legendComboBox = new QComboBox();
-    legendComboBox->addItem("No Legend ", 0);
-    legendComboBox->addItem("Legend Top", Qt::AlignTop);
-    legendComboBox->addItem("Legend Bottom", Qt::AlignBottom);
-    legendComboBox->addItem("Legend Left", Qt::AlignLeft);
-    legendComboBox->addItem("Legend Right", Qt::AlignRight);
-    return legendComboBox;
-    */
     QComboBox *legendComboBox = new QComboBox();
     for(int i(0); i<m_valuenum; i++ )
     {
@@ -270,21 +271,17 @@ QComboBox *ThemeWidget::createLegendBox() const
 QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTable) const
 {
     QChart *chart = new QChart();
-    chart->setTitle(str);
-    QString name("Series ");
+    chart->setTitle(str);    
     int nameIndex = 0;
 
     foreach (DataList list, dataTable )
     {
         QLineSeries *series = new QLineSeries(chart);
-//        foreach (Data data, list)
-//            series->append(data.first);
         series->append(list);
-        series->setName(name + QString::number(nameIndex));
-        nameIndex++;
-//        series->setUseOpenGL(true);
+        series->setName(str + QString::number(nameIndex++));
         g_mapSeries[str].push_back(series);
         chart->addSeries(series);
+        series->setUseOpenGL(true);
     }
     chart->createDefaultAxes();
 
@@ -294,28 +291,60 @@ QChart *ThemeWidget::createLineChart(const QString &str, const DataTable &dataTa
 
 void ThemeWidget::updateUIII()
 {
-    int i = 0;
-
     QString name("Series ");
     int idx = m_legendComboBox->currentIndex();
 
-    foreach (DataList list, m_dataMap[m_values[0] + m_face[0]] )
+    //A面向
+    m_chart_A->setTitle(m_values[idx] + m_face[0]);
+    m_chart_A->removeAllSeries();
+    foreach (DataList list, m_dataMap[m_values[idx] + m_face[0]] )
     {
-//        QLineSeries *series = new QLineSeries(chart);
-        QLineSeries *series = g_mapSeries[m_values[0] + m_face[0]][i];
-        foreach (Data data, list)
-        {
-
-    //        series->replace(data.first.rx(), data.first.ry(), data.first.rx(), 0.02);
-            series->clear();
-//            series->append(data.first.rx(), 0.02);
-        }
-
-        series->setName(name + QString::number(i));
-        i++;
-
-//        chart->addSeries(series);
+        QLineSeries *series = new QLineSeries(m_chart_A);
+        series->append(list);
+//        series->setName(str + QString::number(nameIndex++));
+        m_chart_A->addSeries(series);
+        series->setUseOpenGL(true);
     }
+    m_chart_A->createDefaultAxes();
+
+    //B面向
+    m_chart_B->setTitle(m_values[idx] + m_face[1]);
+    m_chart_B->removeAllSeries();
+    foreach (DataList list, m_dataMap[m_values[idx] + m_face[1]] )
+    {
+        QLineSeries *series = new QLineSeries(m_chart_B);
+        series->append(list);
+//        series->setName(str + QString::number(nameIndex++));
+        m_chart_B->addSeries(series);
+        series->setUseOpenGL(true);
+    }
+    m_chart_B->createDefaultAxes();
+
+    //C面向
+    m_chart_C->setTitle(m_values[idx] + m_face[2]);
+    m_chart_C->removeAllSeries();
+    foreach (DataList list, m_dataMap[m_values[idx] + m_face[2]] )
+    {
+        QLineSeries *series = new QLineSeries(m_chart_C);
+        series->append(list);
+//        series->setName(str + QString::number(nameIndex++));
+        m_chart_C->addSeries(series);
+        series->setUseOpenGL(true);
+    }
+    m_chart_C->createDefaultAxes();
+
+    //D面向
+    m_chart_D->setTitle(m_values[idx] + m_face[3]);
+    m_chart_D->removeAllSeries();
+    foreach (DataList list, m_dataMap[m_values[idx] + m_face[3]] )
+    {
+        QLineSeries *series = new QLineSeries(m_chart_D);
+        series->append(list);
+//        series->setName(str + QString::number(nameIndex++));
+        m_chart_D->addSeries(series);
+        series->setUseOpenGL(true);
+    }
+    m_chart_D->createDefaultAxes();
 
 }
 
@@ -376,7 +405,6 @@ void ThemeWidget::updateUI()
         foreach (QChartView *chartView, m_charts) {
             chartView->chart()->legend()->setAlignment(alignment);
             chartView->chart()->legend()->show();
-//            chartView->chart()->show();
         }
     }
 }
