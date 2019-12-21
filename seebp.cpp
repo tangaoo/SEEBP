@@ -132,7 +132,7 @@ void ThemeWidget::getFileData(const QString &file)
     QList<QString> Lines;
     QString l;
     QFile f(file);
-    qint32 featurenum, i, linenum;
+    qint32 featurenum=0, i=0, linenum=0;
     QString country;
     QList<QString> y;
     QList<QString> values;
