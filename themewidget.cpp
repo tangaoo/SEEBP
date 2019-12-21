@@ -51,6 +51,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QFileDialog>
 #include <QtCore/QTime>
 #include <QtCharts/QBarCategoryAxis>
 #include <QDebug>
@@ -63,7 +64,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_valueMax(10),
     m_valueCount(96),
     m_lineEdit(new QLineEdit),
-    m_button(new QPushButton("Show")),
+    m_button(new QPushButton("Open")),
     m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
     m_themeComboBox(createThemeBox()),
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
@@ -76,14 +77,14 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     // create layout
     baseLayout = new QGridLayout();
     QHBoxLayout *settingsLayout = new QHBoxLayout();
-    settingsLayout->addWidget(new QLabel("Path:"));
+    settingsLayout->addWidget(new QLabel(" Path:"));
     settingsLayout->addWidget(m_lineEdit);
     settingsLayout->addWidget(m_button);
 //    settingsLayout->addWidget(new QLabel("Theme:"));
 //    settingsLayout->addWidget(m_themeComboBox);
 //    settingsLayout->addWidget(new QLabel("Animation:"));
 //    settingsLayout->addWidget(m_animatedComboBox);
-    settingsLayout->addWidget(new QLabel("    Value:"));
+    settingsLayout->addWidget(new QLabel("  Value:"));
     settingsLayout->addWidget(m_legendComboBox);
 //    settingsLayout->addWidget(m_antialiasCheckBox);
     settingsLayout->addStretch();
@@ -282,11 +283,23 @@ QChart *ThemeWidget::createLineChart(const QString &str) const
 
 void ThemeWidget::buttonReleased()
 {
-//    m_chart_A->setTitle(m_lineEdit->text() );  train.tra
-    if(m_lineEdit->text() == "" )
-        return;
+    QString curPath;
+    if(m_lineEdit->text().isEmpty())
+        curPath = QDir::currentPath();
+    else
+    {
+        curPath = m_lineEdit->text();//.split(".").first();
+    }
+    QString digTitle = "Choose *.tra file";
+    QString filter = "tra file(*.tra);;all files(*.*)";
 
-    getFileData(m_lineEdit->text());
+    QString fileName = QFileDialog::getOpenFileName(this, digTitle, curPath, filter);
+    if(fileName.isEmpty())
+        return;
+    m_lineEdit->setText(fileName);
+
+    m_dataMap.clear();
+    getFileData(fileName);
 
     for(int i(0); i<m_valuenum; i++ )
     {
