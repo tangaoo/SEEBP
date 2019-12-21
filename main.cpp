@@ -1,4 +1,4 @@
-﻿#include "themewidget.h"
+﻿#include "seebp.h"
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
 

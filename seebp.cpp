@@ -27,7 +27,7 @@
 **
 ****************************************************************************/
 
-#include "themewidget.h"
+#include "seebp.h"
 
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
