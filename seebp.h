@@ -67,6 +67,7 @@ private Q_SLOTS:
     void updateUI();
     void updateUIII();
     void buttonReleased();
+    void selectedLine();
 
 private:
     DataTable generateRandomData(int listCount, int valueMax, int valueCount) const;

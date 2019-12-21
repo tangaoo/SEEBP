@@ -291,6 +291,14 @@ void ThemeWidget::buttonReleased(void)
 
 }
 
+void ThemeWidget::selectedLine()
+{
+
+
+        qDebug() << "hi";
+
+}
+
 void ThemeWidget::updateUIII()
 {
     QString name("Series ");
@@ -304,6 +312,7 @@ void ThemeWidget::updateUIII()
         QLineSeries *series = new QLineSeries(m_chart_A);
         series->append(list);
 //        series->setName(str + QString::number(nameIndex++));
+        connect(series, SIGNAL(clicked(QPointF)), this, SLOT(selectedLine()));
         m_chart_A->addSeries(series);
         series->setUseOpenGL(true);
     }
