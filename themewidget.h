@@ -76,6 +76,7 @@ private:
     QComboBox *createLegendBox() const;
     void connectSignals();
     QChart *createLineChart(const QString &str) const;
+    void reStart(void);
 
 private:
     int m_listCount;

@@ -65,13 +65,10 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_valueCount(96),
     m_lineEdit(new QLineEdit),
     m_button(new QPushButton("Open")),
-    m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
     m_themeComboBox(createThemeBox()),
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
     m_animatedComboBox(createAnimationBox())
 {
-
-//    getFileData("train.tra");
     m_legendComboBox = createLegendBox();
     connectSignals();
     // create layout
@@ -80,13 +77,8 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     settingsLayout->addWidget(new QLabel(" Path:"));
     settingsLayout->addWidget(m_lineEdit);
     settingsLayout->addWidget(m_button);
-//    settingsLayout->addWidget(new QLabel("Theme:"));
-//    settingsLayout->addWidget(m_themeComboBox);
-//    settingsLayout->addWidget(new QLabel("Animation:"));
-//    settingsLayout->addWidget(m_animatedComboBox);
     settingsLayout->addWidget(new QLabel("  Value:"));
     settingsLayout->addWidget(m_legendComboBox);
-//    settingsLayout->addWidget(m_antialiasCheckBox);
     settingsLayout->addStretch();
     baseLayout->addLayout(settingsLayout, 0, 0, 1, 2);
 
@@ -135,33 +127,8 @@ void ThemeWidget::connectSignals()
 
 }
 
-DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int valueCount) const
-{
-    DataTable dataTable;
-
-    // set seed for random stuff
-    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
-
-    // generate random data
-    for (int i(0); i < listCount; i++) {
-        DataList dataList;
-        qreal yValue(0);
-        for (int j(0); j < valueCount; j++) {
-            yValue = yValue + (qreal)(qrand() % valueMax) / (qreal) valueCount;
-            QPointF value(j, yValue);         
-            dataList << value;
-        }
-        dataTable << dataList;
-    }
-
-    return dataTable;
-}
-
-
 void ThemeWidget::getFileData(const QString &file)
 {    
-    DataTable dataTable;
-
     QList<QString> Lines;
     QString l;
     QFile f(file);
@@ -262,10 +229,6 @@ QComboBox *ThemeWidget::createAnimationBox() const
 QComboBox *ThemeWidget::createLegendBox() const
 {
     QComboBox *legendComboBox = new QComboBox();
-//    for(int i(0); i<m_valuenum; i++ )
-//    {
-//        legendComboBox->addItem(m_values[i], 0);
-//    }
 
     return legendComboBox;
 }
@@ -281,7 +244,23 @@ QChart *ThemeWidget::createLineChart(const QString &str) const
     return chart;
 }
 
-void ThemeWidget::buttonReleased()
+void ThemeWidget::reStart(void)
+{
+    m_dataMap.clear();
+    m_legendComboBox->clear();
+
+    m_chart_A->removeAllSeries();
+    m_chart_A->setTitle("null_A");
+    m_chart_B->removeAllSeries();
+    m_chart_B->setTitle("null_B");
+    m_chart_C->removeAllSeries();
+    m_chart_C->setTitle("null_C");
+    m_chart_D->removeAllSeries();
+    m_chart_D->setTitle("null_D");
+
+}
+
+void ThemeWidget::buttonReleased(void)
 {
     QString curPath;
     if(m_lineEdit->text().isEmpty())
@@ -298,13 +277,18 @@ void ThemeWidget::buttonReleased()
         return;
     m_lineEdit->setText(fileName);
 
-    m_dataMap.clear();
+    disconnect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+    m_legendComboBox->clear();
+    connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+
+//    reStart();
     getFileData(fileName);
 
     for(int i(0); i<m_valuenum; i++ )
     {
         m_legendComboBox->addItem(m_values[i], 0);
     }
+
 }
 
 void ThemeWidget::updateUIII()
