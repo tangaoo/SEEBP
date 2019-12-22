@@ -306,10 +306,26 @@ void ThemeWidget::delBtnReleased(void)
         stream << l;
     }
 
-    delete(&l_list);
+    m_lineEdit2->clear();
 
     f_r.close();
     f_w.close();
+
+    m_fileName = w_fileName;
+    if(m_fileName.isEmpty())
+        return;
+    m_lineEdit->setText(m_fileName);
+
+    disconnect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+    m_legendComboBox->clear();
+    connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+
+    getFileData(m_fileName);
+
+    for(int i(0); i<m_valuenum; i++ )
+    {
+        m_legendComboBox->addItem(m_values[i], 0);
+    }
 
 }
 
@@ -334,7 +350,6 @@ void ThemeWidget::buttonReleased(void)
     m_legendComboBox->clear();
     connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
 
-//    reStart();
     getFileData(m_fileName);
 
     for(int i(0); i<m_valuenum; i++ )
