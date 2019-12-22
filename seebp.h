@@ -67,6 +67,7 @@ private Q_SLOTS:
     void updateUI();
     void updateUIII();
     void buttonReleased();
+    void delBtnReleased();
     void selectedLine();
 
 private:
@@ -84,6 +85,7 @@ private:
     int m_valueMax;
     int m_valueCount;
     int m_valuenum;
+    QString m_fileName;
     QList<QChartView *> m_charts;
     DataTable m_dataTable;
     DataMap m_dataMap;

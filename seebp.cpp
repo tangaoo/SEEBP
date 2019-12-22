@@ -130,6 +130,7 @@ void ThemeWidget::connectSignals()
     connect(m_animatedComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUI()));
     connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
     connect(m_button, SIGNAL(released()), this, SLOT(buttonReleased()));
+    connect(m_button2, SIGNAL(released()), this, SLOT(delBtnReleased()));
 
 }
 
@@ -146,7 +147,7 @@ void ThemeWidget::getFileData(const QString &file)
     QString valueTemp;
     QString valueFaceTemp;
 
-
+    m_dataMap.clear();
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << "open file wrong!";
@@ -201,12 +202,14 @@ void ThemeWidget::getFileData(const QString &file)
             QPointF value(j, y[j+m_valuenum+4].toFloat());
             dataList << value;
         }
-        QPointF value(j, z+6);
+        QPointF value(j, z+7);
         qDebug() << value;
         dataList << value;  //标记行号
 
         m_dataMap[valueFaceTemp].push_back(dataList);
     }
+
+    f.close();
 
 }
 
@@ -254,6 +257,61 @@ QChart *ThemeWidget::createLineChart(const QString &str) const
     return chart;
 }
 
+void ThemeWidget::delBtnReleased(void)
+{
+    if(m_fileName.isEmpty() || m_lineEdit2->text().isEmpty())
+        return;
+
+    //analysis data
+    QList<QString> linenums = m_lineEdit2->text().split(" ");
+    linenums.removeFirst();
+    qDebug() << linenums.size();
+
+    //write to new file
+    QString w_fileName = m_fileName.split(".").first() + "_new." + m_fileName.split(".").last();
+    QFile f_r(m_fileName);
+    QFile f_w(w_fileName);
+
+    qDebug() << w_fileName;
+
+    if (!f_r.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "open f_r wrong!";
+        return;
+    }
+    if (!f_w.open(QIODevice::ReadWrite | QIODevice::Text))
+    {
+        qDebug() << "open f_w wrong!";
+        return;
+    }
+
+    QString l = "";
+    QList<QString> l_list;
+    while(!f_r.atEnd())
+    {
+        l = f_r.readLine();
+        l_list << l;
+    }
+    QList<QString>::iterator it = l_list.begin();
+    *it = QString::number((*it).toInt() - linenums.size()) + "\n";
+    foreach (l, linenums)
+    {
+        l_list.removeAt(l.toInt() -1);
+    }
+
+    QTextStream stream(&f_w);
+    stream.seek(0);
+    foreach (l, l_list)
+    {
+        stream << l;
+    }
+
+    delete(&l_list);
+
+    f_r.close();
+    f_w.close();
+
+}
 
 void ThemeWidget::buttonReleased(void)
 {
@@ -267,17 +325,17 @@ void ThemeWidget::buttonReleased(void)
     QString digTitle = "Choose *.tra file";
     QString filter = "tra file(*.tra);;all files(*.*)";
 
-    QString fileName = QFileDialog::getOpenFileName(this, digTitle, curPath, filter);
-    if(fileName.isEmpty())
+    m_fileName = QFileDialog::getOpenFileName(this, digTitle, curPath, filter);
+    if(m_fileName.isEmpty())
         return;
-    m_lineEdit->setText(fileName);
+    m_lineEdit->setText(m_fileName);
 
     disconnect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
     m_legendComboBox->clear();
     connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
 
 //    reStart();
-    getFileData(fileName);
+    getFileData(m_fileName);
 
     for(int i(0); i<m_valuenum; i++ )
     {
@@ -296,7 +354,6 @@ void ThemeWidget::selectedLine()
 
     qDebug() << series->name();
     m_lineEdit2->setText(errlineStr);
-    qDebug() << "hi";
 
 }
 
@@ -304,7 +361,6 @@ void ThemeWidget::updateUIII()
 {
     QString name("Series ");
     int idx = m_legendComboBox->currentIndex();
-    int nameIndex = 0;
     QPointF value;
 
     //A面向
