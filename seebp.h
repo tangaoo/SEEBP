@@ -97,6 +97,8 @@ private:
 
     QLineEdit *m_lineEdit;
     QPushButton *m_button;
+    QLineEdit *m_lineEdit2;
+    QPushButton *m_button2;
     QGridLayout *baseLayout;
     QComboBox *m_themeComboBox;
     QCheckBox *m_antialiasCheckBox;

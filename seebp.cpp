@@ -65,6 +65,8 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_valueCount(96),
     m_lineEdit(new QLineEdit),
     m_button(new QPushButton("Open")),
+    m_lineEdit2(new QLineEdit),
+    m_button2(new QPushButton("Delete")),
     m_themeComboBox(createThemeBox()),
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
     m_animatedComboBox(createAnimationBox())
@@ -77,6 +79,10 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     settingsLayout->addWidget(new QLabel(" Path:"));
     settingsLayout->addWidget(m_lineEdit);
     settingsLayout->addWidget(m_button);
+    settingsLayout->addWidget(new QLabel("  ErrLines:"));
+    m_lineEdit2->setReadOnly(true);
+    settingsLayout->addWidget(m_lineEdit2);
+    settingsLayout->addWidget(m_button2);
     settingsLayout->addWidget(new QLabel("  Value:"));
     settingsLayout->addWidget(m_legendComboBox);
     settingsLayout->addStretch();
@@ -132,7 +138,7 @@ void ThemeWidget::getFileData(const QString &file)
     QList<QString> Lines;
     QString l;
     QFile f(file);
-    qint32 featurenum=0, i=0, linenum=0;
+    qint32 featurenum=0, linenum=0, i=0, j=0;
     QString country;
     QList<QString> y;
     QList<QString> values;
@@ -164,6 +170,7 @@ void ThemeWidget::getFileData(const QString &file)
  //   while (!f.atEnd())
     for (int z(0); z < linenum; z++)
     {
+        qDebug() << z;
         l = f.readLine();
         y = l.split(" ");
 
@@ -189,11 +196,14 @@ void ThemeWidget::getFileData(const QString &file)
         valueFaceTemp = valueTemp + faceTemp;
 
         DataList dataList;
-        for (int j(0); j < featurenum; j++)
+        for (j = 0; j < featurenum; j++)
         {
             QPointF value(j, y[j+m_valuenum+4].toFloat());
             dataList << value;
         }
+        QPointF value(j, z+6);
+        qDebug() << value;
+        dataList << value;  //标记行号
 
         m_dataMap[valueFaceTemp].push_back(dataList);
     }
@@ -244,21 +254,6 @@ QChart *ThemeWidget::createLineChart(const QString &str) const
     return chart;
 }
 
-void ThemeWidget::reStart(void)
-{
-    m_dataMap.clear();
-    m_legendComboBox->clear();
-
-    m_chart_A->removeAllSeries();
-    m_chart_A->setTitle("null_A");
-    m_chart_B->removeAllSeries();
-    m_chart_B->setTitle("null_B");
-    m_chart_C->removeAllSeries();
-    m_chart_C->setTitle("null_C");
-    m_chart_D->removeAllSeries();
-    m_chart_D->setTitle("null_D");
-
-}
 
 void ThemeWidget::buttonReleased(void)
 {
@@ -293,9 +288,15 @@ void ThemeWidget::buttonReleased(void)
 
 void ThemeWidget::selectedLine()
 {
+    QString errlineStr = "";
 
+    QLineSeries *series = qobject_cast<QLineSeries*>(sender());  //get signal source
 
-        qDebug() << "hi";
+    errlineStr = m_lineEdit2->text() + " " + series->name();
+
+    qDebug() << series->name();
+    m_lineEdit2->setText(errlineStr);
+    qDebug() << "hi";
 
 }
 
@@ -303,6 +304,8 @@ void ThemeWidget::updateUIII()
 {
     QString name("Series ");
     int idx = m_legendComboBox->currentIndex();
+    int nameIndex = 0;
+    QPointF value;
 
     //A面向
     m_chart_A->setTitle(m_values[idx] + m_face[0]);
@@ -310,8 +313,9 @@ void ThemeWidget::updateUIII()
     foreach (DataList list, m_dataMap[m_values[idx] + m_face[0]] )
     {
         QLineSeries *series = new QLineSeries(m_chart_A);
+        value = list.takeLast();
         series->append(list);
-//        series->setName(str + QString::number(nameIndex++));
+        series->setName(QString::number(value.ry()));
         connect(series, SIGNAL(clicked(QPointF)), this, SLOT(selectedLine()));
         m_chart_A->addSeries(series);
         series->setUseOpenGL(true);
@@ -324,8 +328,10 @@ void ThemeWidget::updateUIII()
     foreach (DataList list, m_dataMap[m_values[idx] + m_face[1]] )
     {
         QLineSeries *series = new QLineSeries(m_chart_B);
+        value = list.takeLast();
         series->append(list);
-//        series->setName(str + QString::number(nameIndex++));
+        series->setName(QString::number(value.ry()));
+        connect(series, SIGNAL(clicked(QPointF)), this, SLOT(selectedLine()));
         m_chart_B->addSeries(series);
         series->setUseOpenGL(true);
     }
@@ -337,8 +343,10 @@ void ThemeWidget::updateUIII()
     foreach (DataList list, m_dataMap[m_values[idx] + m_face[2]] )
     {
         QLineSeries *series = new QLineSeries(m_chart_C);
+        value = list.takeLast();
         series->append(list);
-//        series->setName(str + QString::number(nameIndex++));
+        series->setName(QString::number(value.ry()));
+        connect(series, SIGNAL(clicked(QPointF)), this, SLOT(selectedLine()));
         m_chart_C->addSeries(series);
         series->setUseOpenGL(true);
     }
@@ -350,8 +358,10 @@ void ThemeWidget::updateUIII()
     foreach (DataList list, m_dataMap[m_values[idx] + m_face[3]] )
     {
         QLineSeries *series = new QLineSeries(m_chart_D);
+        value = list.takeLast();
         series->append(list);
-//        series->setName(str + QString::number(nameIndex++));
+        series->setName(QString::number(value.ry()));
+        connect(series, SIGNAL(clicked(QPointF)), this, SLOT(selectedLine()));
         m_chart_D->addSeries(series);
         series->setUseOpenGL(true);
     }
