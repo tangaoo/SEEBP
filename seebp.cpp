@@ -56,7 +56,7 @@
 #include <QtCharts/QBarCategoryAxis>
 #include <QDebug>
 
-QMap<QString, QList<QLineSeries *>> g_mapSeries;
+//QMap<QString, QList<QLineSeries *>> g_mapSeries;
 
 ThemeWidget::ThemeWidget(QWidget *parent) :
     QWidget(parent),
