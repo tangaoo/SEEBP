@@ -30,17 +30,7 @@
 #include "seebp.h"
 
 #include <QtCharts/QChartView>
-#include <QtCharts/QPieSeries>
-#include <QtCharts/QPieSlice>
-#include <QtCharts/QAbstractBarSeries>
-#include <QtCharts/QPercentBarSeries>
-#include <QtCharts/QStackedBarSeries>
-#include <QtCharts/QBarSeries>
-#include <QtCharts/QBarSet>
 #include <QtCharts/QLineSeries>
-#include <QtCharts/QSplineSeries>
-#include <QtCharts/QScatterSeries>
-#include <QtCharts/QAreaSeries>
 #include <QtCharts/QLegend>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QFormLayout>
@@ -178,7 +168,7 @@ void ThemeWidget::getFileData(const QString &file)
         //get face
         for(i=0; i<4; i++)
         {
-            if(1.0 - y[i].toFloat() < 0.01 )
+            if(1.0 - y[i].toDouble() < 0.01 )
                 break;
         }
         if(i >= 4)
@@ -188,7 +178,7 @@ void ThemeWidget::getFileData(const QString &file)
         //get values
         for(i=4; i<4+m_valuenum; i++)
         {
-            if(1.0 - y[i].toFloat() < 0.01 )
+            if(1.0 - y[i].toDouble() < 0.01 )
                 break;
         }
         if(i >= 4+m_valuenum)
@@ -199,7 +189,7 @@ void ThemeWidget::getFileData(const QString &file)
         DataList dataList;
         for (j = 0; j < featurenum; j++)
         {
-            QPointF value(j, y[j+m_valuenum+4].toFloat());
+            QPointF value(j, y[j+m_valuenum+4].toDouble());
             dataList << value;
         }
         QPointF value(j, z+7);
