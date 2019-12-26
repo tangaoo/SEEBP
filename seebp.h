@@ -34,6 +34,7 @@
 #include <QtCharts/QChartGlobal>
 #include <QtWidgets/QGridLayout>
 #include <QMap>
+#include <QFile>
 
 
 QT_BEGIN_NAMESPACE
@@ -56,15 +57,14 @@ typedef QMap<QString, DataTable> DataMap;
 
 QT_CHARTS_USE_NAMESPACE
 
-class ThemeWidget: public QWidget
+class SeeBpWidget: public QWidget
 {
     Q_OBJECT
 public:
-    explicit ThemeWidget(QWidget *parent = 0);
-    ~ThemeWidget();
+    explicit SeeBpWidget(QWidget *parent = 0);
+    ~SeeBpWidget();
 
 private Q_SLOTS:
-    void updateUI();
     void updateUIII();
     void buttonReleased();
     void delBtnReleased();
@@ -73,14 +73,12 @@ private Q_SLOTS:
 private:
     DataTable generateRandomData(int listCount, int valueMax, int valueCount) const;
     void getFileData(const QString &file);
-    QComboBox *createThemeBox() const;
-    QComboBox *createAnimationBox() const;
-    QComboBox *createLegendBox() const;
     void connectSignals();
     QChart *createLineChart(const QString &str) const;
-    void reStart(void);
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
+    QChart *initChart(QString s, int first, int second);
+    int analyzeFile(QFile &f);
 
 
 private:
@@ -88,10 +86,9 @@ private:
     int m_valueMax;
     int m_valueCount;
     int m_valuenum;
-    QString m_fileName;
-    QList<QChartView *> m_charts;
+    QString   m_fileName;
     DataTable m_dataTable;
-    DataMap m_dataMap;
+    DataMap   m_dataMap;
     const QVector<QString> m_face = {"_A", "_B", "_C", "_D", ""}; //向量越界
     QList<QString> m_values;
 
@@ -100,15 +97,13 @@ private:
     QChart *m_chart_C;
     QChart *m_chart_D;
 
-    QLineEdit *m_lineEdit;
+    QLineEdit   *m_lineEdit;
     QPushButton *m_button;
-    QLineEdit *m_lineEdit2;
+    QLineEdit   *m_lineEdit2;
     QPushButton *m_button2;
-    QGridLayout *baseLayout;
-    QComboBox *m_themeComboBox;
-    QCheckBox *m_antialiasCheckBox;
-    QComboBox *m_animatedComboBox;
-    QComboBox *m_legendComboBox;
+    QGridLayout *m_baseLayout;
+    QComboBox   *m_valueComboBox;
+
 };
 
 #endif /* THEMEWIDGET_H */

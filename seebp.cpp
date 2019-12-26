@@ -35,9 +35,6 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QSpinBox>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -48,10 +45,10 @@
 #include <QDrag>
 #include <QDragEnterEvent>
 #include <QMimeData>
+#include <QPair>
 
-//QMap<QString, QList<QLineSeries *>> g_mapSeries;
 
-ThemeWidget::ThemeWidget(QWidget *parent) :
+SeeBpWidget::SeeBpWidget(QWidget *parent) :
     QWidget(parent),
     m_listCount(100),
     m_valueMax(10),
@@ -60,15 +57,15 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_button(new QPushButton("Open")),
     m_lineEdit2(new QLineEdit),
     m_button2(new QPushButton("Delete")),
-    m_themeComboBox(createThemeBox()),
-    m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
-    m_animatedComboBox(createAnimationBox())
+    m_valueComboBox(new QComboBox)
+
 {
     setAcceptDrops(true);
-    m_legendComboBox = createLegendBox();
     connectSignals();
+
     // create layout
-    baseLayout = new QGridLayout();
+    m_baseLayout = new QGridLayout();
+
     QHBoxLayout *settingsLayout = new QHBoxLayout();
     settingsLayout->addWidget(new QLabel(" Path:"));
     settingsLayout->addWidget(m_lineEdit);
@@ -78,63 +75,33 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     settingsLayout->addWidget(m_lineEdit2);
     settingsLayout->addWidget(m_button2);
     settingsLayout->addWidget(new QLabel("  Value:"));
-    settingsLayout->addWidget(m_legendComboBox);
+    settingsLayout->addWidget(m_valueComboBox);
     settingsLayout->addStretch();
-    baseLayout->addLayout(settingsLayout, 0, 0, 1, 2);
 
 
-    //create charts
+    m_baseLayout->addLayout(settingsLayout, 0, 0, 1, 2);
 
-    QChartView *chartView;
+    m_chart_A = initChart("null_A", 1, 0);
+    m_chart_B = initChart("null_B", 1, 1);
+    m_chart_C = initChart("null_C", 2, 0);
+    m_chart_D = initChart("null_D", 2, 1);
 
+    setLayout(m_baseLayout);
 
-    m_chart_A = createLineChart("null_A");
-    chartView = new QChartView(m_chart_A);
-    baseLayout->addWidget(chartView, 1, 0);
-    m_charts << chartView;
-    m_chart_A->setAcceptDrops(true);
-
-    m_chart_B = createLineChart("null_B");
-    chartView = new QChartView(m_chart_B);
-    baseLayout->addWidget(chartView, 1, 1);
-    m_charts << chartView;
-    m_chart_B->setAcceptDrops(true);
-
-    m_chart_C = createLineChart("null_C");
-    chartView = new QChartView(m_chart_C);
-    baseLayout->addWidget(chartView, 2, 0);
-    m_charts << chartView;
-    m_chart_C->setAcceptDrops(true);
-
-    m_chart_D = createLineChart("null_D");
-    chartView = new QChartView(m_chart_D);
-    baseLayout->addWidget(chartView, 2, 1);
-    m_charts << chartView;
-    m_chart_D->setAcceptDrops(true);
-
-    setLayout(baseLayout);
-
-    // Set defaults
-    m_antialiasCheckBox->setChecked(true);
-    updateUI();
 }
 
-ThemeWidget::~ThemeWidget()
-{
-}
+SeeBpWidget::~SeeBpWidget()
+{}
 
-void ThemeWidget::connectSignals()
+void SeeBpWidget::connectSignals()
 {
-    connect(m_themeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUI()));
-    connect(m_antialiasCheckBox, SIGNAL(toggled(bool)), this, SLOT(updateUI()));
-    connect(m_animatedComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUI()));
-    connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+    connect(m_valueComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
     connect(m_button, SIGNAL(released()), this, SLOT(buttonReleased()));
     connect(m_button2, SIGNAL(released()), this, SLOT(delBtnReleased()));
 
 }
 
-void ThemeWidget::getFileData(const QString &file)
+void SeeBpWidget::getFileData(const QString &file)
 {    
     QList<QString> Lines;
     QString l;
@@ -152,6 +119,7 @@ void ThemeWidget::getFileData(const QString &file)
     {
         qDebug() << "open file wrong!";
     }
+
 
     if(!f.atEnd())
     {
@@ -213,41 +181,7 @@ void ThemeWidget::getFileData(const QString &file)
 
 }
 
-QComboBox *ThemeWidget::createThemeBox() const
-{
-    // settings layout
-    QComboBox *themeComboBox = new QComboBox();
-    themeComboBox->addItem("Light", QChart::ChartThemeLight);
-    themeComboBox->addItem("Blue Cerulean", QChart::ChartThemeBlueCerulean);
-    themeComboBox->addItem("Dark", QChart::ChartThemeDark);
-    themeComboBox->addItem("Brown Sand", QChart::ChartThemeBrownSand);
-    themeComboBox->addItem("Blue NCS", QChart::ChartThemeBlueNcs);
-    themeComboBox->addItem("High Contrast", QChart::ChartThemeHighContrast);
-    themeComboBox->addItem("Blue Icy", QChart::ChartThemeBlueIcy);
-    themeComboBox->addItem("Qt", QChart::ChartThemeQt);
-    return themeComboBox;
-}
-
-QComboBox *ThemeWidget::createAnimationBox() const
-{
-    // settings layout
-    QComboBox *animationComboBox = new QComboBox();
-    animationComboBox->addItem("No Animations", QChart::NoAnimation);
-    animationComboBox->addItem("GridAxis Animations", QChart::GridAxisAnimations);
-    animationComboBox->addItem("Series Animations", QChart::SeriesAnimations);
-    animationComboBox->addItem("All Animations", QChart::AllAnimations);
-    return animationComboBox;
-}
-
-QComboBox *ThemeWidget::createLegendBox() const
-{
-    QComboBox *legendComboBox = new QComboBox();
-
-    return legendComboBox;
-}
-
-
-QChart *ThemeWidget::createLineChart(const QString &str) const
+QChart *SeeBpWidget::createLineChart(const QString &str) const
 {
     QChart *chart = new QChart();
     chart->setTitle(str);    
@@ -257,7 +191,7 @@ QChart *ThemeWidget::createLineChart(const QString &str) const
     return chart;
 }
 
-void ThemeWidget::delBtnReleased(void)
+void SeeBpWidget::delBtnReleased(void)
 {
     if(m_fileName.isEmpty() || m_lineEdit2->text().isEmpty())
         return;
@@ -316,20 +250,20 @@ void ThemeWidget::delBtnReleased(void)
         return;
     m_lineEdit->setText(m_fileName);
 
-    disconnect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
-    m_legendComboBox->clear();
-    connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+    disconnect(m_valueComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+    m_valueComboBox->clear();
+    connect(m_valueComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
 
     getFileData(m_fileName);
 
     for(int i(0); i<m_valuenum; i++ )
     {
-        m_legendComboBox->addItem(m_values[i], 0);
+        m_valueComboBox->addItem(m_values[i], 0);
     }
 
 }
 
-void ThemeWidget::buttonReleased(void)
+void SeeBpWidget::buttonReleased(void)
 {
     QString curPath;
     if(m_lineEdit->text().isEmpty())
@@ -346,20 +280,22 @@ void ThemeWidget::buttonReleased(void)
         return;
     m_lineEdit->setText(m_fileName);
 
-    disconnect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
-    m_legendComboBox->clear();
-    connect(m_legendComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+    disconnect(m_valueComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
+    m_valueComboBox->clear();
+//    connect(m_valueComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUIII()));
 
     getFileData(m_fileName);
 
     for(int i(0); i<m_valuenum; i++ )
     {
-        m_legendComboBox->addItem(m_values[i], 0);
+        m_valueComboBox->addItem(m_values[i], 0);
     }
+
+    updateUIII();
 
 }
 
-void ThemeWidget::selectedLine()
+void SeeBpWidget::selectedLine()
 {
     QString errlineStr = "";
 
@@ -372,10 +308,10 @@ void ThemeWidget::selectedLine()
 
 }
 
-void ThemeWidget::updateUIII()
+void SeeBpWidget::updateUIII()
 {
     QString name("Series ");
-    int idx = m_legendComboBox->currentIndex();
+    int idx = m_valueComboBox->currentIndex();
     QPointF value;
 
     //A面向
@@ -441,7 +377,7 @@ void ThemeWidget::updateUIII()
 }
 
 //仅在themewidget上生效
-void ThemeWidget::dragEnterEvent(QDragEnterEvent *e)
+void SeeBpWidget::dragEnterEvent(QDragEnterEvent *e)
 {
     if(e->mimeData()->hasFormat("text/uri-list")) //只能打开文本文件
     {
@@ -452,7 +388,7 @@ void ThemeWidget::dragEnterEvent(QDragEnterEvent *e)
 
 }
 
-void ThemeWidget::dropEvent(QDropEvent *e)
+void SeeBpWidget::dropEvent(QDropEvent *e)
 {
     qDebug() << "drop enter";
     QList<QUrl> urls = e->mimeData()->urls();
@@ -464,64 +400,29 @@ void ThemeWidget::dropEvent(QDropEvent *e)
 
 }
 
-void ThemeWidget::updateUI()
+QChart *SeeBpWidget::initChart(QString s, int first, int second)
 {
-    QChart::ChartTheme theme = (QChart::ChartTheme) m_themeComboBox->itemData(m_themeComboBox->currentIndex()).toInt();
+    QChart *chart = new QChart();
+    chart->setTitle(s);
+    chart->createDefaultAxes();
+    chart->setAcceptDrops(true);
 
-    if (m_charts.at(0)->chart()->theme() != theme) {
-        foreach (QChartView *chartView, m_charts)
-            chartView->chart()->setTheme(theme);
+    QChartView *chartView = new QChartView(chart);
+    m_baseLayout->addWidget(chartView, first, second);
+    chartView->setRenderHint(QPainter::Antialiasing, true);
+    chartView->chart()->legend()->hide();
 
-        QPalette pal = window()->palette();
-        if (theme == QChart::ChartThemeLight) {
-            pal.setColor(QPalette::Window, QRgb(0xf0f0f0));
-            pal.setColor(QPalette::WindowText, QRgb(0x404044));
-        } else if (theme == QChart::ChartThemeDark) {
-            pal.setColor(QPalette::Window, QRgb(0x121218));
-            pal.setColor(QPalette::WindowText, QRgb(0xd6d6d6));
-        } else if (theme == QChart::ChartThemeBlueCerulean) {
-            pal.setColor(QPalette::Window, QRgb(0x40434a));
-            pal.setColor(QPalette::WindowText, QRgb(0xd6d6d6));
-        } else if (theme == QChart::ChartThemeBrownSand) {
-            pal.setColor(QPalette::Window, QRgb(0x9e8965));
-            pal.setColor(QPalette::WindowText, QRgb(0x404044));
-        } else if (theme == QChart::ChartThemeBlueNcs) {
-            pal.setColor(QPalette::Window, QRgb(0x018bba));
-            pal.setColor(QPalette::WindowText, QRgb(0x404044));
-        } else if (theme == QChart::ChartThemeHighContrast) {
-            pal.setColor(QPalette::Window, QRgb(0xffab03));
-            pal.setColor(QPalette::WindowText, QRgb(0x181818));
-        } else if (theme == QChart::ChartThemeBlueIcy) {
-            pal.setColor(QPalette::Window, QRgb(0xcee7f0));
-            pal.setColor(QPalette::WindowText, QRgb(0x404044));
-        } else {
-            pal.setColor(QPalette::Window, QRgb(0xf0f0f0));
-            pal.setColor(QPalette::WindowText, QRgb(0x404044));
-        }
-        window()->setPalette(pal);
-    }
+    return chart;
 
-    bool checked = m_antialiasCheckBox->isChecked();
-    foreach (QChartView *chart, m_charts)
-        chart->setRenderHint(QPainter::Antialiasing, checked);
-
-    QChart::AnimationOptions options(m_animatedComboBox->itemData(m_animatedComboBox->currentIndex()).toInt());
-    if (m_charts.at(0)->chart()->animationOptions() != options) {
-        foreach (QChartView *chartView, m_charts)
-            chartView->chart()->setAnimationOptions(options);
-    }
-
-    Qt::Alignment alignment(m_legendComboBox->itemData(m_legendComboBox->currentIndex()).toInt());
-
-    if (!alignment) {
-        foreach (QChartView *chartView, m_charts)
-            chartView->chart()->legend()->hide();
-    } else {
-        foreach (QChartView *chartView, m_charts) {
-            chartView->chart()->legend()->setAlignment(alignment);
-            chartView->chart()->legend()->show();
-        }
-    }
 }
+
+int SeeBpWidget::analyzeFile(QFile &f)
+{
+
+    return 0;
+
+}
+
+
 
 
