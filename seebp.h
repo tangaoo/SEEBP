@@ -79,6 +79,9 @@ private:
     void connectSignals();
     QChart *createLineChart(const QString &str) const;
     void reStart(void);
+    void dragEnterEvent(QDragEnterEvent *e);
+    void dropEvent(QDropEvent *e);
+
 
 private:
     int m_listCount;

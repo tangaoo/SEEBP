@@ -45,6 +45,9 @@
 #include <QtCore/QTime>
 #include <QtCharts/QBarCategoryAxis>
 #include <QDebug>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QMimeData>
 
 //QMap<QString, QList<QLineSeries *>> g_mapSeries;
 
@@ -61,6 +64,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
     m_animatedComboBox(createAnimationBox())
 {
+    setAcceptDrops(true);
     m_legendComboBox = createLegendBox();
     connectSignals();
     // create layout
@@ -78,29 +82,35 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     settingsLayout->addStretch();
     baseLayout->addLayout(settingsLayout, 0, 0, 1, 2);
 
+
     //create charts
 
     QChartView *chartView;
+
 
     m_chart_A = createLineChart("null_A");
     chartView = new QChartView(m_chart_A);
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
+    m_chart_A->setAcceptDrops(true);
 
     m_chart_B = createLineChart("null_B");
     chartView = new QChartView(m_chart_B);
     baseLayout->addWidget(chartView, 1, 1);
     m_charts << chartView;
+    m_chart_B->setAcceptDrops(true);
 
     m_chart_C = createLineChart("null_C");
     chartView = new QChartView(m_chart_C);
     baseLayout->addWidget(chartView, 2, 0);
     m_charts << chartView;
+    m_chart_C->setAcceptDrops(true);
 
     m_chart_D = createLineChart("null_D");
     chartView = new QChartView(m_chart_D);
     baseLayout->addWidget(chartView, 2, 1);
     m_charts << chartView;
+    m_chart_D->setAcceptDrops(true);
 
     setLayout(baseLayout);
 
@@ -430,6 +440,29 @@ void ThemeWidget::updateUIII()
 
 }
 
+//仅在themewidget上生效
+void ThemeWidget::dragEnterEvent(QDragEnterEvent *e)
+{
+    if(e->mimeData()->hasFormat("text/uri-list")) //只能打开文本文件
+    {
+        e->acceptProposedAction(); //可以在这个窗口部件上拖放对象
+        qDebug() << "drag enter";
+    }
+
+
+}
+
+void ThemeWidget::dropEvent(QDropEvent *e)
+{
+    qDebug() << "drop enter";
+    QList<QUrl> urls = e->mimeData()->urls();
+    if(urls.isEmpty())
+        return ;
+
+    QString fileName = urls.first().toLocalFile();
+    qDebug() << fileName;
+
+}
 
 void ThemeWidget::updateUI()
 {
